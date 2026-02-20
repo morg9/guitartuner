@@ -13,6 +13,12 @@ public class AudioCapture {
 	private TargetDataLine line;
 	private volatile boolean running = false;
 	
+	private AudioDataListener listener;
+
+	public void setListener(AudioDataListener listener) {
+		this.listener = listener;
+	}
+	
 	public void start() {
 		try {
 			AudioFormat format = createAudioFormat();
@@ -42,10 +48,17 @@ public class AudioCapture {
 	
 	private void captureLoop() {
 		byte[] buffer = new byte[Constants.BUFFER_SIZE];
+		
 		while (running) {
 			int bytesRead = line.read(buffer, 0, buffer.length);
 			
 			if (bytesRead > 0) {
+				if (listener != null) {
+					byte[] copy = new byte[bytesRead];
+					System.arraycopy(buffer, 0, copy, 0, bytesRead);
+					listener.onAudioFrame(copy, bytesRead);
+				}
+				
 				System.out.println("Read " + bytesRead + " bytes"); // Temporary confirmation of received audio
 			}
 		}
