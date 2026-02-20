@@ -11,17 +11,44 @@ import com.morg9.guitartuner.util.Constants;
 public class AudioCapture {
 	
 	private TargetDataLine line;
+	private volatile boolean running = false;
 	
 	public void start() {
 		try {
 			AudioFormat format = createAudioFormat();
 			line = getTargetDataLine(format);
 			line.start();
+			
+			running = true; 
+			
+			Thread captureThread = new Thread(this::captureLoop, "Audio-Capture-Thread");
+			captureThread.start();
 			System.out.println("Audio capture started...");
+			
 		}	catch (LineUnavailableException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void stop() {
+		running = false;
 		
+		if (line != null) {
+			line.stop();
+			line.close();
+		}
+		System.out.println("Audio capture stopped.");
+	}
+	
+	private void captureLoop() {
+		byte[] buffer = new byte[Constants.BUFFER_SIZE];
+		while (running) {
+			int bytesRead = line.read(buffer, 0, buffer.length);
+			
+			if (bytesRead > 0) {
+				System.out.println("Read " + bytesRead + " bytes"); // Temporary confirmation of received audio
+			}
+		}
 	}
 	
 	private AudioFormat createAudioFormat() {
