@@ -13,9 +13,9 @@ public class AudioCapture {
 	private TargetDataLine line;
 	private volatile boolean running = false;
 	
-	private AudioDataListener listener;
+	private AudioFrameListener listener;
 
-	public void setListener(AudioDataListener listener) {
+	public void setListener(AudioFrameListener listener) {
 		this.listener = listener;
 	}
 	

@@ -1,8 +1,8 @@
 package com.morg9.guitartuner.signal;
 
-import com.morg9.guitartuner.audio.AudioDataListener;
+import com.morg9.guitartuner.audio.AudioFrameListener;
 
-public class AudioFrameConverter implements AudioDataListener {
+public class AudioFrameConverter implements AudioFrameListener {
 
 	@Override
 	public void onAudioFrame(byte[] buffer, int bytesRead) {
