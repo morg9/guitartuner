@@ -59,7 +59,7 @@ public class AudioCapture {
 					listener.onAudioFrame(copy, bytesRead);
 				}
 				
-				System.out.println("Read " + bytesRead + " bytes"); // Temporary confirmation of received audio
+				//System.out.println("Read " + bytesRead + " bytes"); // Temporary confirmation of received audio
 			}
 		}
 	}
