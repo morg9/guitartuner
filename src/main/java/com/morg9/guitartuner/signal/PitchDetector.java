@@ -7,8 +7,23 @@ public class PitchDetector implements AudioSampleListener {
 	
 	private double lastPitch = -1;
 	
+	private void removeDCOffset(double[] samples) {
+		double mean = 0.0;
+		
+		for (double s : samples) {
+			mean += s;
+		}
+		
+		mean /= samples.length;
+		
+		for (int i = 0; i < samples.length; i++) {
+			samples[i] -= mean;
+		}
+	}
 	@Override
 	public void onSamples(double[] samples) {
+		
+		removeDCOffset(samples);
 		double pitch = detectPitch(samples);
 		
 		if (pitch > 0 && Math.abs(pitch - lastPitch) > 0.5) {
