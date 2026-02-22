@@ -57,21 +57,19 @@ public class PitchDetector {
 		
 		double threshold = 0.3;
 		
-		double maxValue = Double.NEGATIVE_INFINITY;
-		int bestLag = -1;
+		int lag = minLag; // skip initial downward slope after lag 0
 		
-		for (int lag = minLag; lag <= maxLag && lag < autocorrelation.length; lag++) {
-			if (autocorrelation[lag] > maxValue) {
-				maxValue = autocorrelation[lag];
-				bestLag = lag;
+		while (lag + 1 < autocorrelation.length && autocorrelation[lag] > autocorrelation[lag + 1]) {
+			lag++;
+		}
+		
+		for (; lag + 1 <= maxLag && lag + 1 < autocorrelation.length; lag++) {
+			if (autocorrelation[lag] > threshold && autocorrelation[lag] > autocorrelation[lag-1] && autocorrelation[lag] > autocorrelation[lag + 1]) {
+				return lag;
 			}
 		}
-		
-		if (maxValue < threshold ) {
-			return -1;
-		}
-		
-		return bestLag;
+
+		return -1;
 	}
 }
     
