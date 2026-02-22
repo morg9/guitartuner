@@ -4,14 +4,18 @@ import com.morg9.guitartuner.audio.AudioDataListener;
 
 public class AudioFrameConverter implements AudioDataListener {
 
+	private AudioSampleListener listener;
+	
+	public void setListener(AudioSampleListener listener) {
+		this.listener = listener;
+	}
+	
 	@Override
 	public void onAudioFrame(byte[] buffer, int bytesRead) {
 		double[] samples = convert(buffer, bytesRead);
 		
-		// TODO: forward samples to next stage, e.g., frequency detector
-		// Just printing first 5 samples (w/ 5 decimal places) for verification for now
-		for (int i = 0; i < Math.min(5, samples.length); i++) {
-			System.out.printf("Sample[%d]: %.5f%n", i, samples[i]);
+		if (listener != null) {
+			listener.onSamples(samples);
 		}
 	}
 
@@ -27,5 +31,4 @@ public class AudioFrameConverter implements AudioDataListener {
 		}
 		return samples;
 	}
-	
 }
