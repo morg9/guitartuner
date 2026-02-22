@@ -1,9 +1,22 @@
 package com.morg9.guitartuner.signal;
 
-public class PitchDetector {
+public class PitchDetector implements AudioSampleListener {
 	private final int sampleRate;
 	private final double minFrequency;
 	private final double maxFrequency;
+	
+	private double lastPitch = -1;
+	
+	@Override
+	public void onSamples(double[] samples) {
+		double pitch = detectPitch(samples);
+		
+		if (pitch > 0 && Math.abs(pitch - lastPitch) > 0.5) {
+			System.out.printf("Detected: %.2f Hz%n", pitch);
+			lastPitch = pitch;
+		}
+		
+	}
 	
 	public PitchDetector(int sampleRate, double minFrequency, double maxFrequency) {
 		this.sampleRate = sampleRate;
