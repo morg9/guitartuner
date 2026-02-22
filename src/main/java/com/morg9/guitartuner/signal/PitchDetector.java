@@ -20,9 +20,21 @@ public class PitchDetector implements AudioSampleListener {
 			samples[i] -= mean;
 		}
 	}
+	
+	private boolean isSignalStrongEnough(double[] samples) {
+		double energy = 0.0;
+		for (double s: samples) {
+			energy += s * s;
+		}
+		
+		return energy > 0.01;
+	}
 	@Override
 	public void onSamples(double[] samples) {
 		
+		if (!isSignalStrongEnough(samples)) {
+			return;
+		}
 		removeDCOffset(samples);
 		double pitch = detectPitch(samples);
 		
@@ -83,7 +95,7 @@ public class PitchDetector implements AudioSampleListener {
 		int minLag = (int) (sampleRate / maxFrequency);
 		int maxLag = (int) (sampleRate / minFrequency);
 		
-		double threshold = 0.3;
+		double threshold = 0.15;
 		
 		int lag = minLag; // skip initial downward slope after lag 0
 		
@@ -93,7 +105,15 @@ public class PitchDetector implements AudioSampleListener {
 		
 		for (; lag + 1 <= maxLag && lag + 1 < autocorrelation.length; lag++) {
 			if (autocorrelation[lag] > threshold && autocorrelation[lag] > autocorrelation[lag-1] && autocorrelation[lag] > autocorrelation[lag + 1]) {
-				return lag;
+				int candidateLag = lag;
+				int doubledLag = candidateLag*2;
+				if(doubledLag <= maxLag && doubledLag < autocorrelation.length) {
+					if (autocorrelation[doubledLag] > autocorrelation[candidateLag] * 0.8) {
+						candidateLag = doubledLag;
+					}
+				}
+				
+				return candidateLag;
 			}
 		}
 
